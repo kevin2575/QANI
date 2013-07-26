@@ -6,8 +6,9 @@ score = zeros(1,n);
 
 for i = 1:n
     im = imread([pth '\img' num2str(i) '.bmp']);
-    im = im2double(rgb2gray(im));
-    score(i) = blurPerception(im);
+    im = rgb2gray(im);
+    score(i) = cptScore(im);
+    i
 end
 save('subScores.mat','score');
 load dmos145;
