@@ -8,6 +8,7 @@ for i = 1:n
     im = imread([pth '\img' num2str(i) '.bmp']);
     im = im2double(rgb2gray(im));
     score(i) = cptScore(im);
+    i,score(i)
 end
 save('subScores.mat','score');
 load dmos145;

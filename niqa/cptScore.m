@@ -7,14 +7,14 @@ function [ score ] = cptScore( im )
 %todo: 3.get the normalization score
 
 pc = phasecongmono(im);
-h = fspecial('gaussian');
+h = fspecial('motion',10,0);
 bim = imfilter(im,h);
 
 [m n] = size(pc);
 %w = zeros(m,n);
 
 k = 5; %set size of patch to 5*5 
-t = 0.3; %threshold to take into consideration
+t = 0.4; %threshold to take into consideration
 num = 0; %number of valide patches
 for i = 1:k:(m-k+1)
     for j = 1:k:(n-k+1)
@@ -36,9 +36,9 @@ function w = getWeight(im)
 %
 t = mean2(im);
 t1 = mean(im(im>=t));
-t2 = mean(im(im<t));
+t2 = mean(im(im<=t));
 t12 = (t1+t2)/2;
-w = mean(im(im>t12));
+w = mean(im(im>=t12));
 
 
 function v = getVariationRatio(im1,im2)
@@ -52,4 +52,8 @@ for i = 1:m
         s2 = s2 + abs(im2(i,j) - im2(i,j+1));
     end
 end
-v = (s1 - s2)/s1;
+if s1==0
+    v = 0;
+else
+    v = (s1 - s2)/(s1+0.000001);
+end
