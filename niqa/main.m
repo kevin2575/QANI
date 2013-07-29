@@ -4,11 +4,13 @@ d = d(3:end);
 n = length(d);
 score = zeros(1,n);
 
+h = fspecial('gaussian',5,4);
 for i = 1:n
     im = imread([pth '\img' num2str(i) '.bmp']);
     im = im2double(rgb2gray(im));
-    score(i) = blurPerception(im);
+    score(i) = iqa(im,h);
+    i,score(i)
 end
 save('subScores.mat','score');
 load dmos145;
-cftool(dmos145,score);
+cftool(score,dmos145);
