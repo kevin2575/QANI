@@ -1,4 +1,4 @@
-function score = iqa(im,h)
+function score = iqa(im,h,k,step)
 %mqa Summary of this function goes here
 %   Detailed explanation goes here
 %     score: quantification of image quality(0~1)
@@ -7,15 +7,13 @@ function score = iqa(im,h)
     imblurred = imfilter(im,h);
     bw = edge(im,'canny');
     [m,n] = size(im);
-    
     s = 0;
-    k = 5; %set size of patch to 5*5
-    for i = ceil(k/2):m-floor(k/2)
-        for j = ceil(k/2):n-floor(k/2)
+    hsize = floor(k/2);
+    for i = ceil(k/2):step:m-hsize
+        for j = ceil(k/2):step:n-hsize
             if bw(i,j) == 1
-                step = floor(k/2);
-                matIm = im(i-step:i+step,j-step:j+step);
-                matImblurred = imblurred(i-step:i+step,j-step:j+step);
+                matIm = im(i-hsize:i+hsize,j-hsize:j+hsize);
+                matImblurred = imblurred(i-hsize:i+hsize,j-hsize:j+hsize);
                 similarity = corr2(matIm,matImblurred);
                 s = s + similarity;
             end
