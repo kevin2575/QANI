@@ -1,9 +1,10 @@
 function [ blur_F ] = blurPerception( F )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
-%   ²Î¿¼ÎÄÏ×£º
-%   The blur effect: perception and estimation with a new no-reference perceptual blur metric
-
+%F = imread('1125.jpg');
+%F = imread(pa);
+%F = double(rgb2gray(F));
+%F = double(F);
 hv = fspecial('motion',10,90);
 hh = fspecial('motion',10,0);
 Bver = imfilter(F,hv);
