@@ -37,8 +37,8 @@ s_Fhor = sum(D_Fhor(:));
 s_Vver = sum(D_Vver(:));
 s_Vhor = sum(D_Vhor(:));
 
-b_Fver = 1 - s_Vver/s_Fver;
-b_Fhor = 1 - s_Vhor/s_Fhor;
+b_Fver = s_Vver/s_Fver;
+b_Fhor = s_Vhor/s_Fhor;
 
 blur_F = max(b_Fver,b_Fhor);
 
