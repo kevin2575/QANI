@@ -13,12 +13,13 @@ function [ width,vh,vv ] = getBlurWidth( im,r,c,nvh,nvv )
 %todo: 5.stop exploring at some conditions.
 
 [m,n] = size(im);
-widthPosOrt = 1;  % set a default minimum width at the positive orientation,supposing zero at the left-up corner
+widthPosOrt = 1;  % set a default minimum width at the positive orientation(the right half plane and suppose zero at the left-up corner)
 widthNegOrt = 1;  % set a default minimum width at teh negative orientation....
 maxWidth = 30; % Temporarily,we set the possible maximum width to 30
 
 vh = nvh;vv = nvv;
-if nvh == 0
+if nvh < 1e-3
+    nvh = 0;
     for i = 1:maxWidth
         if r+i > m
             break;
@@ -35,7 +36,7 @@ if nvh == 0
         widthPosOrt = widthPosOrt + 1;
     end
     for i = -1:-1:-maxWidth
-        if r+i < 0
+        if r+i < 1
             break;
         end
         if i == -1 && im(r+i,c) > im(r,c)
@@ -51,11 +52,12 @@ if nvh == 0
     end
 else    
     if nvh<0
-        nvh = 1;nvv = nvv/nvh;
+        nvv = nvv/nvh;
+        nvh = 1;
     end
     value1 = im(r,c);
     for i = 1:maxWidth
-        if c+i > n
+        if c+i > n || r+floor(i*nvv)+1 > m || r+floor(i*nvv) <1
             break;
         end
         floor_value = im(r+floor(i*nvv),c+i);
@@ -79,7 +81,7 @@ else
     
     value1 = im(r,c);
     for i = -1:-1:-maxWidth
-        if c+i < 0
+        if c+i < 1 || r+floor(i*nvv)+1 > m || r+floor(i*nvv) <1
             break;
         end
         floor_value = im(r+floor(i*nvv),c+i);
@@ -102,11 +104,15 @@ else
     end
 end
 width = max(widthPosOrt,widthNegOrt);
-figure(1),hold on,quiver(c,r,vh,vv,width);
-if widthPosOrt < widthNegOrt
+%figure(1),hold on,quiver(c,r,vh,vv,width);
+if widthPosOrt > widthNegOrt && vh < 0
     vh = -vh;
     vv = -vv;
 end
-figure(1),hold on,quiver(c,r,vh,vv,width);
+if widthPosOrt < widthNegOrt && vh > 0
+    vh = -vh;
+    vv = -vv;
+end
+%figure(1),hold on,quiver(c,r,vh,vv,width);
 end
 
