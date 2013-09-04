@@ -51,11 +51,9 @@ for i=1:10:len
         tvv = 1;
     end
     nvh = tvv;nvv = -tvh;
-    %figure(1),hold on,quiver(cols(i),rows(i),nvh,nvv,40);
+    figure(1),hold on,quiver(cols(i),rows(i),nvh,nvv,40);
     
     
-    [width(num),nvh,nvv] = getBlurWidth(im_gPb,rows(i),cols(i),nvh,nvv);    
-    figure(1),hold on,quiver(cols(i),rows(i),nvh,nvv,width(num));
+    width(num) = getBlurWidth(im_gPb,rows(i),cols(i),nvh,nvv);
     num = num+1;
 end
-w = sum(width)/num;
