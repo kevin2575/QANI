@@ -21,7 +21,7 @@ for j = 1:length(d)
         error('iamge data type not appropriate');%!!!!!!!!!!!!!!!
     end
     [m,n] = size(im_ucm);
-    %figure(1),imshow(im_gPb);
+    figure,imshow(im_gPb);
     
     
     k = 11;% edge length of neighborhood
@@ -58,11 +58,14 @@ for j = 1:length(d)
         
         
         [width(num),nvh,nvv] = getBlurWidth(im_gPb,rows(i),cols(i),nvh,nvv);
-        %figure(1),hold on,quiver(cols(i),rows(i),nvh,nvv,width(num));
+       
+        hold on,
+        text(cols(i),rows(i),num2str(i)),
+        quiver(cols(i),rows(i),nvh,nvv,width(num));
         num = num+1;
     end
     w(j) = sum(width)/num;
-    j
+    j 
 end
 load dmos145;
 plot(w,dmos145,'*');

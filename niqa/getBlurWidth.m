@@ -18,16 +18,17 @@ widthNegOrt = 1;  % set a default minimum width at teh negative orientation....
 maxWidth = 30; % Temporarily,we set the possible maximum width to 30
 
 vh = nvh;vv = nvv;
-if nvh < 1e-3
+if abs(nvh) < 1e-3
     nvh = 0;
     for i = 1:maxWidth
         if r+i > m
             break;
         end
-        if i == 1 && im(r+i,c)>im(r,c) %do the calibration of 1 pixel, if there exists some error
+        if (i <= 3) && im(r+i,c)>im(r+i-1,c) %do the calibration of 1 or 2 pixels, if there exists some error
+            r = r+1;
             continue;
         end
-        if im(r+i,c) >= im(r+i-1,c)
+        if im(r+i,c) > im(r+i-1,c)
             break;
         end
         if im(r+i,c)<0.04  % 0.04 is the minimum gray level we can catch
@@ -39,10 +40,10 @@ if nvh < 1e-3
         if r+i < 1
             break;
         end
-        if i == -1 && im(r+i,c) > im(r,c)
+        if i >= -3 && im(r+i,c) > im(r,c)
             continue;
         end
-        if im(r+i,c) >= im(r+i+1,c)
+        if im(r+i,c) > im(r+i+1,c)
             break;
         end
         if im(r+i,c) < 0.04
@@ -50,26 +51,32 @@ if nvh < 1e-3
         end
         widthNegOrt = widthNegOrt + 1;
     end
-else    
-    if nvh<0
-        nvv = nvv/nvh;
-        nvh = 1;
-    end
+else
+    nvv = nvv/nvh;
+    nvh = 1;
+    
     value1 = im(r,c);
+    t = norm([1,nvv]);
     for i = 1:maxWidth
-        if c+i > n || r+floor(i*nvv)+1 > m || r+floor(i*nvv) <1
-            break;
+        dh = i/t;dv=i*nvv/t;
+        ind_lu_ver = r + floor(dv);  ind_lu_hor = c + floor(dh);
+        ind_ru_ver = r + floor(dv);  ind_ru_hor = c + floor(dh) + 1;
+        ind_ld_ver = r + floor(dv)+1;ind_ld_hor = c + floor(dh);
+        ind_rd_ver = r + floor(dv)+1;ind_rd_hor = c + floor(dh) + 1;
+        if ind_lu_ver < 1 || ind_lu_hor < 1 || ind_rd_ver > m || ind_rd_hor > n
+            break;%exceed boundary!!!!!!!!!!!
         end
-        floor_value = im(r+floor(i*nvv),c+i);
-        ceil_value = im(r+floor(i*nvv)+1,c+i);
-        weight_floor_value = (r+floor(i*nvv)+1) - (r+i*nvv);
-        weight_ceil_value = (r+i*nvv) - (r+floor(i*nvv));
-        value2 = floor_value*weight_floor_value + ceil_value*weight_ceil_value;
-        if i == 1 && value2 > value1  %do the calibration of 1 pixel, in case of error
+        lu = im(ind_lu_ver,ind_lu_hor);
+        ru = im(ind_ru_ver,ind_ru_hor);
+        ld = im(ind_ld_ver,ind_ld_hor);
+        rd = im(ind_rd_ver,ind_rd_hor);
+        value2 = (lu+ru+ld+rd)/4;
+        
+        if i <= 3 && value2 > value1  %do the calibration of 1~3 pixels, in case of error
             value1 = value2;
             continue;
         end
-        if value2 >= value1
+        if value2 > value1
             break;
         end
         if value2 < 0.04
@@ -81,19 +88,25 @@ else
     
     value1 = im(r,c);
     for i = -1:-1:-maxWidth
-        if c+i < 1 || r+floor(i*nvv)+1 > m || r+floor(i*nvv) <1
-            break;
+        dh = i/t;dv=i*nvv/t;
+        ind_lu_ver = r + floor(dv);  ind_lu_hor = c + floor(dh);
+        ind_ru_ver = r + floor(dv);  ind_ru_hor = c + floor(dh) + 1;
+        ind_ld_ver = r + floor(dv)+1;ind_ld_hor = c + floor(dh);
+        ind_rd_ver = r + floor(dv)+1;ind_rd_hor = c + floor(dh) + 1;
+        if ind_lu_ver < 1 || ind_lu_hor < 1 || ind_rd_ver > m || ind_rd_hor > n
+            break;%exceed boundary!!!!!!!!!!!
         end
-        floor_value = im(r+floor(i*nvv),c+i);
-        ceil_value = im(r+floor(i*nvv)+1,c+i);
-        weight_floor_value = (r+floor(i*nvv)+1) - (r+i*nvv);
-        weight_ceil_value = (r+i*nvv) - (r+floor(i*nvv));
-        value2 = floor_value*weight_floor_value + ceil_value*weight_ceil_value;
-        if i == -1 && value2 > value1  %do the calibration of 1 pixel, in case of error
+        lu = im(ind_lu_ver,ind_lu_hor);
+        ru = im(ind_ru_ver,ind_ru_hor);
+        ld = im(ind_ld_ver,ind_ld_hor);
+        rd = im(ind_rd_ver,ind_rd_hor);
+        value2 = (lu+ru+ld+rd)/4;
+        
+        if i >= -3 && value2 > value1  %do the calibration of 1 pixel, in case of error
             value1 = value2;
             continue;
         end
-        if value2 >= value1
+        if value2 > value1
             break;
         end
         if value2 < 0.04
@@ -112,6 +125,13 @@ end
 if widthPosOrt < widthNegOrt && vh > 0
     vh = -vh;
     vv = -vv;
+end
+if abs(nvh) < 1e-3
+    if widthPosOrt > widthNegOrt
+        vv = abs(vv);
+    else
+        vv = -abs(vv);
+    end
 end
 %figure(1),hold on,quiver(c,r,vh,vv,width);
 end
