@@ -21,7 +21,7 @@ for j = 1:length(d)
         error('iamge data type not appropriate');%!!!!!!!!!!!!!!!
     end
     [m,n] = size(im_ucm);
-    figure,imshow(im_gPb);
+    %figure,imshow(im_gPb);
     
     
     k = 11;% edge length of neighborhood
@@ -41,6 +41,7 @@ for j = 1:length(d)
     [rows,cols] = find(im_ucm_new == 1);
     len = length(rows);
     num = 1;
+    width = 0;
     for i=1:10:len
         if rows(i)-rk<0 || cols(i)-rk<0 || rows(i)+rk>m || cols(i)+rk>n
             error('index exceed boundary');%!!!!!!!!!!!!!!!!
@@ -59,12 +60,16 @@ for j = 1:length(d)
         
         [width(num),nvh,nvv] = getBlurWidth(im_gPb,rows(i),cols(i),nvh,nvv);
        
-        hold on,
-        text(cols(i),rows(i),num2str(i)),
-        quiver(cols(i),rows(i),nvh,nvv,width(num));
+        %gcf,hold on,
+        %text(cols(i),rows(i),num2str(width(num))),
+        %quiver(cols(i),rows(i),nvh,nvv,width(num));
         num = num+1;
     end
-    w(j) = sum(width)/num;
+    %w(j) = sum(width)/num;
+    bwidth = sort(width,'descend');
+    f = floor(length(bwidth)/2);
+    hbwidth = bwidth(1:f);
+    w(j) = mean(hbwidth);
     j 
 end
 load dmos145;
