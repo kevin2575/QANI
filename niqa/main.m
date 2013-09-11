@@ -8,26 +8,29 @@ close all;clear,clc;
 pth = 'F:/zzr/images/gblur';d = dir([pth '/*.bmp']);
 pth_gPb = 'F:/zzr/images/gblur_gPb';d_gPb = dir([pth_gPb '/*.bmp']);
 pth_ucm = 'F:/zzr/images/gblur_gPb_ucm';d_ucm = dir([pth_ucm '/*.bmp']);
+pth_seg = 'F:/zzr/images/gblur_seg';d_seg = dir([pth_seg '/*.mat']);
 
 
 
-for j = 1:length(d)
+for j = 24%1:length(d)
     im_ucm_name = [pth_ucm '/img' num2str(j) '.bmp'];
     im_ucm = double(imread(im_ucm_name))/255;
     im_gPb_name = [pth_gPb '/img' num2str(j) '.bmp'];
     im_gPb = double(imread(im_gPb_name))/255;
+    im_seg_name = [pth_seg '/img' num2str(j) '.mat'];
+    load(im_seg_name);
+    im_seg = labels;
     if size(im_ucm,3)~=1 || max(im_ucm(:))>1 || min(im_ucm(:))<0 ||...
             size(im_gPb,3)~=1 || max(im_gPb(:))>1 || min(im_ucm(:))<0
         error('iamge data type not appropriate');%!!!!!!!!!!!!!!!
     end
     [m,n] = size(im_ucm);
-    %figure,imshow(im_gPb);
+    figure(1),clf,imshow(im_gPb);
     
     
     k = 11;% edge length of neighborhood
     rk = floor(k/2);
     temp_ucm = im_ucm;
-    %temp_ucm([1:rk,end-rk+1:end],[1:rk,end-rk+1:end]) = 0;
     temp_ucm([1:rk,end-rk+1:end],:) = 0;
     temp_ucm(:,[1:rk,end-rk+1:end]) = 0;
     maxValue = max(temp_ucm(:));
@@ -37,7 +40,8 @@ for j = 1:length(d)
         selected = (temp_ucm >= maxValue);
     end
     im_ucm_new = (temp_ucm >= maxValue);
-    %figure(2),imshow(im_ucm_new)%show the im_ucm_new !!!!!!!!!!!!!!!
+    figure(2),clf,imshow(im_ucm_new)%show the im_ucm_new !!!!!!!!!!!!!!!
+    figure(3),imshow(im_seg,[]),gcf,colormap jet;
     [rows,cols] = find(im_ucm_new == 1);
     len = length(rows);
     num = 1;
@@ -60,9 +64,9 @@ for j = 1:length(d)
         
         [width(num),nvh,nvv] = getBlurWidth(im_gPb,rows(i),cols(i),nvh,nvv);
        
-        %gcf,hold on,
+        figure(1),hold on,
         %text(cols(i),rows(i),num2str(width(num))),
-        %quiver(cols(i),rows(i),nvh,nvv,width(num));
+        quiver(cols(i),rows(i),nvh,nvv,width(num));
         num = num+1;
     end
     %w(j) = sum(width)/num;
