@@ -1,32 +1,25 @@
-pth = 'D:\ms\gblur';
-d = dir(pth);
-d = d(3:end);
+pth = 'F:\zzr\images\gblur';
+d = dir([pth '\*.bmp']);
+%d = d(3:end);
 n = length(d);
 score = zeros(1,n);
 
-CoreNum=4; %设定机器CPU核心数量，我的机器是双核，所以
-if matlabpool('size')<=0 %判断并行计算环境是否已然启动
-    matlabpool('open','local',CoreNum); %若尚未启动，则启动并行环境
-else
-    disp('Already initialized'); %说明并行环境已经启动。
+gsize = 6;
+gsigma = 3;
+k = 5;
+step = 1;
+h = fspecial('gaussian',gsize,gsigma);
+
+for i = 1:n
+    im = imread([pth '\img' num2str(i) '.bmp']);
+    im1 = im2double(rgb2gray(im));
+    im2 = downSample(im1,2);
+    im3 = downSample(im1,3);
+    s1 = iqa(im1,h,k,step);
+    s2 = iqa(im2,h,k,step);
+    s3 = iqa(im3,h,k,step);
+    score(i) = mean([s1 s2 s3]);
+    i,score(i)
 end
 
-for gsize = 3:8
-    for gsigma = 3:10
-        for k = 3:2:9
-            for step = 1:k
-                h = fspecial('gaussian',gsize,gsigma);
-                tic
-                parfor i = 1:n
-                    im = imread([pth '\img' num2str(i) '.bmp']);
-                    im = im2double(rgb2gray(im));
-                    score(i) = iqa(im,h,k,step);
-                    %i,score(i)
-                end
-                save([num2str(gsize) '.' num2str(gsigma) '.' num2str(k) '.' num2str(step) '.mat'],'score');
-                toc
-            end
-        end
-    end
-end
-matlabpool close;
+a = 10;
