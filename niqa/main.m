@@ -1,23 +1,18 @@
 %todo: 1.prepair the data needed later
-%todo: 2.read one image,im_ucm,ensure the datatype
-%todo: 3.compute and show the normal vector for some eminent edges,then
-%        show
-%todo: 4.compute the real length for the normal vector,then show it
+%todo: 2.get the blur version of the original image
+%todo: 3.compute the similarity score
 
 close all;clear,clc;
 pth = 'F:/zzr/images/gblur';d = dir([pth '/*.bmp']);
-pth_ref = 'F:/zzr/images/gblur_ref';d_ref = dir([pth_ref '/*.bmp']);
-load gblur_rel;
+n = length(d);
+score = zeros(1,n);
+h = fspecial('gaussian',6,3);
 
-
-for j = 1:29
-    refimg = imread([pth_ref '/' num2str(j) '.bmp']);
-    %refimg = rgb2gray(refimg);
-    for i = 1:5
-        img = imread([pth '/img' num2str(rel(i,j)) '.bmp']);
-        %img = rgb2gray(img);
-        s(rel(i,j)) = FeatureSIM(refimg,img);
-    end
+for j = 1:n
+    im = im2double(rgb2gray(imread([pth '/img' num2str(j) '.bmp'])));
+    im_blur = imfilter(im,h);
+    
+    s(j) = FeatureSIM(im,im_blur);
     j
 end
 load dmos145;
