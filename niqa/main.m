@@ -21,4 +21,4 @@ for j = 1:29
     j
 end
 load dmos145;
-plot(w,dmos145,'*');
+plot(1-s,dmos145,'*');
